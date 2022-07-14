@@ -1,22 +1,32 @@
 #include <Arduino.h>
 #include "signal.h"
+#include "PID.h"
+
+
 
 void SIGNAL_Init(void)
-{
-    pinMode(EMG,INPUT);
-    pinMode(EMG_POTENTIOMETER,INPUT);
+{   pinMode(EMG,INPUT);
+    pinMode(EMG_potentiometer,INPUT);
+
     pinMode(SIGNAL_BUTTON,INPUT);
 }
 
 int SIGNAL_Reading(void)
-{
-  int error = analogRead(EMG_POTENTIOMETER) - analogRead(EMG);
+{ 
+  int pot_read = analogRead(EMG_potentiometer); 
   
-  if(error < 0)
+  
+  int EMG_read = analogRead(EMG);
+  delay(200);
+  
+  if (EMG_read != 0 )
   {
-    error = -1*error;  
+    
+  EMG_read = PIDController_Update(EMG_read,analogRead(EMG));
+  
   }
-  if(error > 250 || digitalRead(SIGNAL_BUTTON))
+ 
+  if(EMG_read > pot_read || digitalRead(SIGNAL_BUTTON))
   {
     return 1;  
   }
